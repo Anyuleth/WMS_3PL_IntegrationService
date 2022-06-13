@@ -1,0 +1,10 @@
+﻿{
+  "profiles": {
+    "WMS_3PL_IntegrationService.PedidosCompras": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

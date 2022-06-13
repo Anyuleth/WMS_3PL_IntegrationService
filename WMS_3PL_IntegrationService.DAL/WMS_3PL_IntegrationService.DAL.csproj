@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.0" />
+    <PackageReference Include="Microsoft.IdentityModel.Protocols" Version="5.2.1" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WMS_3PL_IntegrationService.ENTITY\WMS_3PL_IntegrationService.ENTITY.csproj" />
+    <ProjectReference Include="..\WMS_3PL_IntegrationService.UTILITY\WMS_3PL_IntegrationService.UTILITY.csproj" />
+  </ItemGroup>
+
+</Project>

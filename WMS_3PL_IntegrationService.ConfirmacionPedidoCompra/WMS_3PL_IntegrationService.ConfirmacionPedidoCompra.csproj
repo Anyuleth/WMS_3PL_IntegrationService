@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UserSecretsId>dotnet-WMS_3PL_IntegrationService.ConfirmacionPedidoCompra-C3DAFFEE-017E-407F-BE5C-A10E48A86A73</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.9" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="3.1.0" />
+    <PackageReference Include="Quartz.Extensions.Hosting" Version="3.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WMS_3PL_IntegrationService.BLL\WMS_3PL_IntegrationService.BLL.csproj" />
+  </ItemGroup>
+</Project>
