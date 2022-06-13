@@ -20,7 +20,7 @@ namespace WMS_3PL_IntegrationService.BLL.PedidosCompras
 
                     UTILITY.XML.CreateXML(@"C:\Program Files (x86)\AR Holdings\3PL\PedidosCompras.xml", pedidos, serialiser);
 
-                    UTILITY.SFTP.SendSFTP(@"C:\Program Files (x86)\AR Holdings\3PL\PedidosCompras.xml");
+                    //UTILITY.SFTP.SendSFTP(@"C:\Program Files (x86)\AR Holdings\3PL\PedidosCompras.xml");
                 }
 
 
