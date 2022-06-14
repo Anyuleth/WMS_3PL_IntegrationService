@@ -29,7 +29,8 @@ namespace WMS_3PL_IntegrationService.DAL.Clientes
             }
             catch (Exception ex)
             {
-
+                var mensaje = ex.InnerException != null ? ex.Message + ", " + ex.InnerException.Message : ex.Message;
+                DAL.Herramientas.GuardarError(new ENTITY.Errores.Errores("Libreria: BLL - Clase: Clientes - Metodo: ObtenerClientesPendientes", mensaje.ToString()));
             }
             return null;
         }

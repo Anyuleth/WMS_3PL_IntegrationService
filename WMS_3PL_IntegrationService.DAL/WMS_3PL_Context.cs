@@ -2,6 +2,8 @@
 using System;
 using Microsoft.IdentityModel.Protocols;
 using WMS_3PL_IntegrationService.ENTITY;
+using Microsoft.Extensions.Configuration;
+using System.IO;
 
 namespace WMS_3PL_IntegrationService.DAL
 {
@@ -11,8 +13,10 @@ namespace WMS_3PL_IntegrationService.DAL
         private readonly string connectionString;
         public WMS_3PL_Context() : base()
         {
+            var builder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+            IConfiguration configuration = builder.Build();
 
-            this.connectionString = "Data Source=3.224.17.235, 14333;Initial Catalog=BTOB;User ID=icgadmin;Password=masterkey"; 
+            this.connectionString = (configuration["ConnectionString"]);//"Data Source=3.224.17.235, 14333;Initial Catalog=BTOB;User ID=icgadmin;Password=masterkey"; 
         }
 
      
@@ -22,6 +26,7 @@ namespace WMS_3PL_IntegrationService.DAL
         public DbSet<ENTITY.AjusteInventario.AjusteInventario> AjusteInventario { get; set; }
         public DbSet<ENTITY.ConciliacionInventarios.ConciliacionInventario> ConciliacionInventario { get; set; }
         public DbSet<ENTITY.PedidosCompras.PedidosCompra> PedidosCompra { get; set; }
+        public DbSet<ENTITY.PedidosCompras.Lineas> Lineas { get; set; }
         public DbSet<ENTITY.Precios.PreciosU> Precio { get; set; }
         public DbSet<ENTITY.ConfirmacionPedidoCompra.ConfirmacionPedidoCompra> ConfirmacionPedidoCompra { get; set; }
 
@@ -46,11 +51,10 @@ namespace WMS_3PL_IntegrationService.DAL
             modelBuilder.Entity<ENTITY.Cliente>().HasNoKey();
             modelBuilder.Entity<ENTITY.AjusteInventario.AjusteInventario>().HasNoKey();
             modelBuilder.Entity<ENTITY.ConciliacionInventarios.ConciliacionInventario>().HasNoKey();
-           // modelBuilder.Entity<ENTITY.PedidosCompras.PedidosCompra>().HasNoKey();
             modelBuilder.Entity<ENTITY.Precios.PreciosU>().HasNoKey();
             modelBuilder.Entity<ENTITY.ConfirmacionPedidoCompra.ConfirmacionPedidoCompra>().HasNoKey();
-            modelBuilder.Entity<ENTITY.PedidosCompras.Detalle>().HasNoKey();
-            //modelBuilder.Entity<ENTITY.PedidosCompras.Encabezado>().HasNoKey();
+            modelBuilder.Entity<ENTITY.PedidosCompras.PedidosCompra>().HasKey(x => new { x.Documento, x.Empresa, x.Tipo });
+            modelBuilder.Entity<ENTITY.PedidosCompras.Lineas>().HasKey(x => new { x.linea_Numero, x.Producto});
 
 
 

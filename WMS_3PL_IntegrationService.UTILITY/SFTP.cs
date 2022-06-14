@@ -1,4 +1,5 @@
-﻿using Renci.SshNet;
+﻿using Microsoft.Extensions.Configuration;
+using Renci.SshNet;
 using Renci.SshNet.Sftp;
 using System;
 using System.Collections.Generic;
@@ -14,14 +15,16 @@ namespace WMS_3PL_IntegrationService.UTILITY
 
             try
             {
-              
+                var builder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+                IConfiguration configuration = builder.Build();
 
 
-                var hostName = @"172.23.24.54";
-                var userName = "anyuleth.cortes";
-                var portNumber = "22";
-                var password = @"_vNNtL%x;rkb9/G}";
-                var sftpDestinationUrl = @"/FromWMS/";
+
+                var hostName = (configuration["HostSFTP"]);//@"172.23.24.54";
+                var userName = (configuration["Usuario"]);//"anyuleth.cortes";
+                var portNumber = (configuration["Puerto"]);//"22";
+                var password = (configuration["pass"]);//@"_vNNtL%x;rkb9/G}";
+                var sftpDestinationUrl  = (configuration["FromWMS"]); //@"/FromWMS/";
 
                 SftpClient client = new SftpClient(hostName, userName, password);
              

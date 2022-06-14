@@ -15,7 +15,7 @@ namespace WMS_3PL_IntegrationService.PedidosCompras.Jobs
         public Task Execute(IJobExecutionContext context)
         {
             _logger.LogInformation("WMS_3PL_Job Executing!");
-            //BLL.SendData.SendWMS_3PLReports();
+            BLL.PedidosCompras.SendData.SendWMS_3PLPedidos();
 
             return Task.CompletedTask;
         }

@@ -33,7 +33,8 @@ namespace WMS_3PL_IntegrationService.DAL.Articulos
             }
             catch (Exception ex)
             {
-               
+                var mensaje = ex.InnerException != null ? ex.Message + ", " + ex.InnerException.Message : ex.Message;
+                DAL.Herramientas.GuardarError(new ENTITY.Errores.Errores("Libreria: BLL - Clase: Articulos - Metodo: ObtenerArticulosPendientes", mensaje.ToString()));
             }
             return null;
         }
@@ -62,7 +63,8 @@ namespace WMS_3PL_IntegrationService.DAL.Articulos
             }
             catch (Exception ex)
             {
-
+                var mensaje = ex.InnerException != null ? ex.Message + ", " + ex.InnerException.Message : ex.Message;
+                DAL.Herramientas.GuardarError(new ENTITY.Errores.Errores("Libreria: BLL - Clase: Articulos - Metodo: ObtenerCodArticulosPendientes", mensaje.ToString()));
             }
             return null;
         }

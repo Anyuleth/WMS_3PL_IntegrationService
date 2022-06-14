@@ -16,13 +16,14 @@ namespace WMS_3PL_IntegrationService.BLL.Clientes
                 XmlSerializer serialiser = new XmlSerializer(typeof(ENTITY.Clientes));
 
                 UTILITY.XML.CreateXML(@"C:\Program Files (x86)\AR Holdings\3PL\Clientes.xml", clientes, serialiser);
-              
-                // UTILITY.SFTP.SendSFTP(@"C:\Program Files (x86)\AR Holdings\3PL\Articulos.xml");
+
+                UTILITY.SFTP.SendSFTP(@"C:\Program Files (x86)\AR Holdings\3PL\", "Clientes.xml");
 
             }
             catch (Exception ex)
             {
-
+                var mensaje = ex.InnerException != null ? ex.Message + ", " + ex.InnerException.Message : ex.Message;
+                DAL.Herramientas.GuardarError(new ENTITY.Errores.Errores("Libreria: BLL - Clase: SendData - Metodo: SendWMS_3PLClientes", mensaje.ToString()));
 
             }
 

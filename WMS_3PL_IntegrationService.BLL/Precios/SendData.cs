@@ -7,6 +7,7 @@ namespace WMS_3PL_IntegrationService.BLL.Precios
 {
     public class SendData
     {
+
         public static void SendWMS_3PLPrecios()
         {
             try
@@ -17,12 +18,13 @@ namespace WMS_3PL_IntegrationService.BLL.Precios
 
                 UTILITY.XML.CreateXML(@"C:\Program Files (x86)\AR Holdings\3PL\Precios.xml", precios, serialiser);
 
-                // UTILITY.SFTP.SendSFTP(@"C:\Program Files (x86)\AR Holdings\3PL\Articulos.xml");
+                UTILITY.SFTP.SendSFTP(@"C:\Program Files (x86)\AR Holdings\3PL\", "Precios.xml");
 
             }
             catch (Exception ex)
             {
-
+                var mensaje = ex.InnerException != null ? ex.Message + ", " + ex.InnerException.Message : ex.Message;
+                DAL.Herramientas.GuardarError(new ENTITY.Errores.Errores("Libreria: BLL - Clase: SendData - Metodo: SendWMS_3PLPrecios", mensaje.ToString()));
 
             }
 

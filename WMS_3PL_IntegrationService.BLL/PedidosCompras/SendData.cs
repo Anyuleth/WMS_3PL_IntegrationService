@@ -11,24 +11,30 @@ namespace WMS_3PL_IntegrationService.BLL.PedidosCompras
         {
             try
             {
-                List < ENTITY.PedidosCompras.PedidosCompra> pedidos = new List<ENTITY.PedidosCompras.PedidosCompra>();
+                List<ENTITY.PedidosCompras.PedidosCompra> pedidos = new List<ENTITY.PedidosCompras.PedidosCompra>();
                 pedidos = DAL.PedidosCompras.PedidosCompras.ObtenerPedidosPendientes();
+                
 
                 foreach (var item in pedidos)
                 {
-                    XmlSerializer serialiser = new XmlSerializer(typeof(ENTITY.PedidosCompras.PedidosCompras));
+                
+                    item.Linea = DAL.PedidosCompras.PedidosCompras.ObtenerPedidosDetallePendientes();
+                  
 
-                    UTILITY.XML.CreateXML(@"C:\Program Files (x86)\AR Holdings\3PL\PedidosCompras.xml", pedidos, serialiser);
-
-                    //UTILITY.SFTP.SendSFTP(@"C:\Program Files (x86)\AR Holdings\3PL\PedidosCompras.xml");
+                  
                 }
+                XmlSerializer serialiser = new XmlSerializer(typeof(ENTITY.PedidosCompras.PedidosCompra));
+                UTILITY.XML.CreateXML(@"C:\Program Files (x86)\AR Holdings\3PL\PedidosCompras.xml", pedidos, serialiser);
+
+                //UTILITY.SFTP.SendSFTP(@"C:\Program Files (x86)\AR Holdings\3PL\PedidosCompras.xml");
 
 
 
             }
             catch (Exception ex)
             {
-
+                var mensaje = ex.InnerException != null ? ex.Message + ", " + ex.InnerException.Message : ex.Message;
+                DAL.Herramientas.GuardarError(new ENTITY.Errores.Errores("Libreria: BLL - Clase: ProcessData - Metodo: SendWMS_3PLPedidos", mensaje.ToString()));
 
             }
 

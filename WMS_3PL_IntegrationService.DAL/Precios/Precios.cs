@@ -28,6 +28,8 @@ namespace WMS_3PL_IntegrationService.DAL.Precios
             }
             catch (Exception ex)
             {
+                var mensaje = ex.InnerException != null ? ex.Message + ", " + ex.InnerException.Message : ex.Message;
+                DAL.Herramientas.GuardarError(new ENTITY.Errores.Errores("Libreria: BLL - Clase: Precios - Metodo: ObtenerPreciosPendientes", mensaje.ToString()));
 
             }
             return null;

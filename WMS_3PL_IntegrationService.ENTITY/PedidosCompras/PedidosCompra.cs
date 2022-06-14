@@ -8,13 +8,6 @@ namespace WMS_3PL_IntegrationService.ENTITY.PedidosCompras
     [XmlRootAttribute(ElementName = "pedido_compra", IsNullable = false)]
     public class PedidosCompra
     {
-        [XmlElement("encabezado")]
-        public Encabezado Encabezado { get; set; }
-        [XmlElement("detalle")]
-        public Detalle Detalle { get; set; }
-    }
-    public class Encabezado
-    {
         [XmlElement("empresa")]
         public string Empresa { get; set; }
 
@@ -23,16 +16,19 @@ namespace WMS_3PL_IntegrationService.ENTITY.PedidosCompras
 
         [XmlElement("tipo")]
         public string Tipo { get; set; }
-        
+
         [XmlElement("fecha_transmision")]
-        public string Fecha_transmision { get; set; }
+        public DateTime Fecha_transmision { get; set; }
 
         [XmlElement("fecha_entrada")]
         public string Fecha_Entrada { get; set; }
 
-
+        [XmlElement("detalle")]
+        public List<Lineas> Linea { get; set; }
     }
-    public class Linea
+   
+   
+    public class Lineas
     {
         [XmlElement("linea_numero")]
         public int linea_Numero { get; set; }
@@ -49,16 +45,5 @@ namespace WMS_3PL_IntegrationService.ENTITY.PedidosCompras
 
     }
 
-    public class Detalle
-    {
-        [XmlElement("linea")]
-        public List<Linea> Lista_Lineas { get; set; }
-    }
-
-
-    public class PedidosCompras
-    {
-
-        public List<PedidosCompra> PedidosCompra { get; set; }
-    }
+    
 }

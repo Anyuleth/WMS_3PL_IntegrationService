@@ -18,12 +18,13 @@ namespace WMS_3PL_IntegrationService.BLL.CodigoBarras
 
                 UTILITY.XML.CreateXML(@"C:\Program Files (x86)\AR Holdings\3PL\Codigos de Barras.xml", codigoArticulos, serialiser);
 
-                // UTILITY.SFTP.SendSFTP(@"C:\Program Files (x86)\AR Holdings\3PL\Articulos.xml");
+                UTILITY.SFTP.SendSFTP(@"C:\Program Files (x86)\AR Holdings\3PL\", "Codigos de Barras.xml");
 
             }
             catch (Exception ex)
             {
-
+                var mensaje = ex.InnerException != null ? ex.Message + ", " + ex.InnerException.Message : ex.Message;
+                DAL.Herramientas.GuardarError(new ENTITY.Errores.Errores("Libreria: BLL - Clase: SendData - Metodo: SendWMS_3PLCodigoBarras", mensaje.ToString()));
 
             }
 

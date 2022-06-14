@@ -23,7 +23,8 @@ namespace WMS_3PL_IntegrationService.BLL.Articulos
             }
             catch (Exception ex)
             {
-
+                var mensaje = ex.InnerException != null ? ex.Message + ", " + ex.InnerException.Message : ex.Message;
+                DAL.Herramientas.GuardarError(new ENTITY.Errores.Errores("Libreria: BLL - Clase: SendData - Metodo: SendWMS_3PLArticulos", mensaje.ToString()));
 
             }
 
