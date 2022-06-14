@@ -1,0 +1,117 @@
+USE [BTOB]
+GO
+/****** Object:  Table [Catalogos].[PedCompraCab]    Script Date: 09/06/2022 15:03:09 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [Catalogos].[PedCompraCab](
+	[NUMSERIE] [nvarchar](4) NOT NULL,
+	[NUMPEDIDO] [int] NOT NULL,
+	[N] [nvarchar](4) NOT NULL,
+	[CODPROVEEDOR] [int] NULL,
+	[SERIEALBARAN] [nvarchar](4) NULL,
+	[NUMEROALBARAN] [int] NULL,
+	[NALBARAN] [int] NULL,
+	[FECHAPEDIDO] [datetime] NULL,
+	[FECHAENTREGA] [datetime] NULL,
+	[ENVIOPOR] [nvarchar](50) NULL,
+	[TOTBRUTO] [float] NULL,
+	[DTOPP] [float] NULL,
+	[TOTDTOPP] [float] NULL,
+	[DTOCOMERCIAL] [float] NULL,
+	[TOTDTOCOMERCIAL] [float] NULL,
+	[TOTIMPUESTOS] [float] NULL,
+	[TOTNETO] [float] NULL,
+	[CODMONEDA] [int] NULL,
+	[FACTORMONEDA] [float] NULL,
+	[PORTESPAG] [bit] NULL,
+	[SUPEDIDO] [nvarchar](15) NULL,
+	[IVAINCLUIDO] [bit] NULL,
+	[TODORECIBIDO] [bit] NULL,
+	[TIPODOC] [int] NULL,
+	[IDESTADO] [int] NULL,
+	[FECHAMODIFICADO] [datetime] NULL,
+	[HORA] [datetime] NULL,
+	[TRANSPORTE] [int] NULL,
+	[NBULTOS] [int] NULL,
+	[TOTALCARGOSDTOS] [float] NULL,
+	[NORECIBIDO] [bit] NULL,
+	[CODEMPLEADO] [int] NULL,
+	[CONTACTO] [int] NULL,
+	[FROMPEDVENTACENTRAL] [bit] NULL,
+	[FECHACREACION] [datetime] NULL,
+	[NUMIMPRESIONES] [int] NULL,
+ CONSTRAINT [PEDCOMPRACAB_PK] PRIMARY KEY CLUSTERED 
+(
+	[NUMSERIE] ASC,
+	[NUMPEDIDO] ASC,
+	[N] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [Catalogos].[PedCompraLin]    Script Date: 09/06/2022 15:03:09 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [Catalogos].[PedCompraLin](
+	[NUMSERIE] [nvarchar](4) NOT NULL,
+	[NUMPEDIDO] [int] NOT NULL,
+	[N] [nvarchar](4) NOT NULL,
+	[NUMLINEA] [int] NOT NULL,
+	[CODARTICULO] [int] NULL,
+	[REFERENCIA] [nvarchar](15) NULL,
+	[TALLA] [nvarchar](10) NOT NULL,
+	[COLOR] [nvarchar](10) NOT NULL,
+	[DESCRIPCION] [nvarchar](40) NULL,
+	[UNID1] [float] NULL,
+	[UNID2] [float] NULL,
+	[UNID3] [float] NULL,
+	[UNID4] [float] NULL,
+	[UNIDADESTOTAL] [float] NULL,
+	[UNIDADESREC] [float] NULL,
+	[UNIDADESPEN] [float] NULL,
+	[PRECIO] [float] NULL,
+	[DTO] [float] NULL,
+	[TIPOIMPUESTO] [smallint] NULL,
+	[IVA] [float] NULL,
+	[REQ] [float] NULL,
+	[TOTALLINEA] [float] NULL,
+	[CODALMACEN] [nvarchar](3) NULL,
+	[DEPOSITO] [bit] NULL,
+	[PRECIOVENTA] [float] NULL,
+	[NUMKG] [float] NULL,
+	[SUPEDIDO] [nvarchar](15) NULL,
+	[CODCLIENTE] [int] NULL,
+	[CARGO1] [float] NULL,
+	[CARGO2] [float] NULL,
+	[DTOTEXTO] [nvarchar](60) NULL,
+	[ESOFERTA] [bit] NULL,
+	[FECHAENTREGA] [datetime] NULL,
+	[CODENVIO] [int] NULL,
+	[UDMEDIDA2] [float] NULL,
+	[LINEAOCULTA] [bit] NULL,
+	[CODFORMATO] [int] NULL,
+ CONSTRAINT [PEDCOMPRALIN_PK] PRIMARY KEY CLUSTERED 
+(
+	[NUMSERIE] ASC,
+	[NUMPEDIDO] ASC,
+	[N] ASC,
+	[NUMLINEA] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+ALTER TABLE [Catalogos].[PedCompraCab] ADD  DEFAULT ((0)) FOR [TRANSPORTE]
+GO
+ALTER TABLE [Catalogos].[PedCompraLin] ADD  DEFAULT ('.') FOR [TALLA]
+GO
+ALTER TABLE [Catalogos].[PedCompraLin] ADD  DEFAULT ('.') FOR [COLOR]
+GO
+ALTER TABLE [Catalogos].[PedCompraLin]  WITH CHECK ADD  CONSTRAINT [PEDCOMPRALIN_FK] FOREIGN KEY([NUMSERIE], [NUMPEDIDO], [N])
+REFERENCES [Catalogos].[PedCompraCab] ([NUMSERIE], [NUMPEDIDO], [N])
+ON UPDATE CASCADE
+ON DELETE CASCADE
+GO
+ALTER TABLE [Catalogos].[PedCompraLin] CHECK CONSTRAINT [PEDCOMPRALIN_FK]
+GO
