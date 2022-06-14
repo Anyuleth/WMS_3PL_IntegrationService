@@ -16,7 +16,7 @@ namespace WMS_3PL_IntegrationService.DAL
             var builder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
             IConfiguration configuration = builder.Build();
 
-            this.connectionString = (configuration["ConnectionString"]);//"Data Source=3.224.17.235, 14333;Initial Catalog=BTOB;User ID=icgadmin;Password=masterkey"; 
+            this.connectionString = (configuration["ConnectionString"]);
         }
 
      

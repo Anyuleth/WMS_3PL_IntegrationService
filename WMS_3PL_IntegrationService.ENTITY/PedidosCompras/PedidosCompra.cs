@@ -23,11 +23,11 @@ namespace WMS_3PL_IntegrationService.ENTITY.PedidosCompras
         [XmlElement("fecha_entrada")]
         public string Fecha_Entrada { get; set; }
 
-        [XmlElement("detalle")]
+        [XmlElement("linea")]
         public List<Lineas> Linea { get; set; }
     }
-   
-   
+
+    [XmlRootAttribute(ElementName = "detalle", IsNullable = false)]
     public class Lineas
     {
         [XmlElement("linea_numero")]
