@@ -11,13 +11,15 @@ namespace WMS_3PL_IntegrationService.BLL.Clientes
         {
             try
             {
+                var enviadoSFTP = false;
+                var mensaje = string.Empty;
                 ENTITY.Clientes clientes = new ENTITY.Clientes();
                 clientes.Lista_Clientes = DAL.Clientes.Clientes.ObtenerClientesPendientes();
                 XmlSerializer serialiser = new XmlSerializer(typeof(ENTITY.Clientes));
 
                 UTILITY.XML.CreateXML(@"C:\Program Files (x86)\AR Holdings\3PL\Clientes.xml", clientes, serialiser);
 
-                UTILITY.SFTP.SendSFTP(@"C:\Program Files (x86)\AR Holdings\3PL\", "Clientes.xml");
+                UTILITY.SFTP.SendSFTP(@"C:\Program Files (x86)\AR Holdings\3PL\", "Clientes.xml", out enviadoSFTP,out mensaje);
 
             }
             catch (Exception ex)

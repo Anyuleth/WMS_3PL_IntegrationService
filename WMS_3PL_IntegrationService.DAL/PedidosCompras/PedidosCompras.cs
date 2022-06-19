@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ namespace WMS_3PL_IntegrationService.DAL.PedidosCompras
     public class PedidosCompras
     {
         #region Obtener los encabezados de los pedidos pendientes de enviar 
-        public static List<ENTITY.PedidosCompras.PedidosCompra> ObtenerPedidosPendientes()
+        public static List<ENTITY.PedidosCompras.Encabezaddo> ObtenerPedidosPendientes()
         {
 
             try
@@ -21,7 +22,7 @@ namespace WMS_3PL_IntegrationService.DAL.PedidosCompras
 
                 var db = new DAL.WMS_3PL_Context();
 
-                var pedido = db.PedidosCompra.FromSqlRaw("EXECUTE Catalogos.SP_PedidoEncabezado_Obtener").ToList();
+                var pedido = db.PedidosCompraEncabezado.FromSqlRaw("EXECUTE Catalogos.SP_PedidoEncabezado_Obtener").ToList();
 
 
                 return pedido;
@@ -37,7 +38,7 @@ namespace WMS_3PL_IntegrationService.DAL.PedidosCompras
         #endregion
 
         #region Obtener los pedidos pendientes de enviar 
-        public static List<ENTITY.PedidosCompras.Lineas> ObtenerPedidosDetallePendientes()
+        public static List<ENTITY.PedidosCompras.Lineas> ObtenerPedidosDetallePendientes(string idPedido)
         {
 
             try
@@ -45,9 +46,11 @@ namespace WMS_3PL_IntegrationService.DAL.PedidosCompras
 
 
                 var db = new DAL.WMS_3PL_Context();
+                var paramList = new[] {
+                    new SqlParameter("@idPedido", idPedido)};
+                var pedido = db.Detalle.FromSqlRaw("EXECUTE Catalogos.SP_PedidoCompraDetalle_Pendientes @idPedido", parameters: paramList).ToList();
 
-                var pedido = db.Lineas.FromSqlRaw("EXECUTE Catalogos.SP_PedidoDetalle_Obtener").ToList();
-
+                
 
                 return pedido;
 
@@ -58,6 +61,33 @@ namespace WMS_3PL_IntegrationService.DAL.PedidosCompras
                 DAL.Herramientas.GuardarError(new ENTITY.Errores.Errores("Libreria: BLL - Clase: PedidosCompras - Metodo: ObtenerPedidosDetallePendientes", mensaje.ToString()));
             }
             return null;
+        }
+        #endregion
+
+        #region Validar si existe factura
+        public static bool ModificarEstadoPedido(string idPedido, string estado, string mensaje)
+        {
+            var resultado = false;
+            try
+            {
+                using var context =  new DAL.WMS_3PL_Context();
+
+                var paramList = new[] {
+                    new SqlParameter("@IdPedido", idPedido),
+                    new SqlParameter("@Estado", estado), 
+                    new SqlParameter("@Mensaje", mensaje)};
+
+
+                context.Database.ExecuteSqlRaw("EXEC PedidosCompra.SP_CambiarEstado_PedidoCompra @IdPedido,@Estado, @Mensaje", parameters: paramList);
+
+
+            }
+            catch (Exception ex)
+            {
+                var mensajeError = ex.InnerException != null ? ex.Message + ", " + ex.InnerException.Message : ex.Message;
+                DAL.Herramientas.GuardarError(new ENTITY.Errores.Errores("Libreria: BLL - Clase: PedidosCompras - Metodo: ModificarEstadoPedido", mensajeError.ToString()));
+            }
+            return resultado;
         }
         #endregion
     }

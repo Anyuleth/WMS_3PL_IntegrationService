@@ -11,6 +11,8 @@ namespace WMS_3PL_IntegrationService.BLL.Articulos
         {
             try
             {
+                var enviadoSFTP = false;
+                var mensaje = string.Empty;
                 ENTITY.Articulos articulos = new ENTITY.Articulos();
                 articulos.Lista_articulos = DAL.Articulos.Articulos.ObtenerArticulosPendientes();
 
@@ -18,7 +20,7 @@ namespace WMS_3PL_IntegrationService.BLL.Articulos
 
                 UTILITY.XML.CreateXML(@"C:\Program Files (x86)\AR Holdings\3PL\Articulos.xml", articulos, serialiser);
 
-                UTILITY.SFTP.SendSFTP(@"C:\Program Files (x86)\AR Holdings\3PL\", "Articulos.xml");
+                UTILITY.SFTP.SendSFTP(@"C:\Program Files (x86)\AR Holdings\3PL\", "Articulos.xml",out enviadoSFTP, out mensaje);
 
             }
             catch (Exception ex)

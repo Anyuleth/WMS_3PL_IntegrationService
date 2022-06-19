@@ -9,6 +9,16 @@ namespace WMS_3PL_IntegrationService.DAL
 {
     public class Herramientas
     {
+
+        public static string CreaCadena(string servidorBD, string nombreBD, string usuarioBD, string contrasenaBD)
+        {
+            var cadenaDeConexion = new StringBuilder();
+            cadenaDeConexion.Append("Data Source= " + servidorBD);
+            cadenaDeConexion.Append("; Initial Catalog= " + nombreBD);
+            cadenaDeConexion.Append("; User ID= " + usuarioBD);
+            cadenaDeConexion.Append("; Password= " + contrasenaBD);
+            return cadenaDeConexion.ToString();
+        }
         #region Registra errores en la Capa de Acceso a Datos
 
         public static void LogException(Exception exc, string source)

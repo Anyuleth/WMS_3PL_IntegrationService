@@ -22,17 +22,17 @@ INSERT INTO Catalogos.PedCompraLin (IdEmpresa,Documento,Linea_Numero, Producto,B
 Select	(Select Top 1 FE_CedulaEmisor From GAP_2.DBO.SeriesCamposLibres Where Nullif(FE_CedulaEmisor, '') Is Not Null) as empresa,
 		PC.SuPedido as documento, PL.NumLinea as linea_numero, Convert(varchar(50), Concat(PL.CodArticulo,  '-', UPPER(PL.Color), '-', UPPER(PL.Talla))) as producto, PL.CodAlmacen as Bodega, 
 				PL.UnidadesTotal as cantidad, PL.Precio as costo_unitario
-		From GAP_2.DBO.PedCompraLin as PL
-		Join GAP_2.DBO.PedCompraCab as PC on PL.NumSerie = PC.NumSerie and PL.NumPedido = PC.NumPedido and PL.N = PC.N
+		From MULTIBRANDS_GAP.DBO.PedCompraLin as PL
+		Join MULTIBRANDS_GAP.DBO.PedCompraCab as PC on PL.NumSerie = PC.NumSerie and PL.NumPedido = PC.NumPedido and PL.N = PC.N
 
 go
 INSERT INTO Catalogos.PedCompraCab (IdEmpresa,Documento,Tipo, Fecha_Entrada)
 	Select (Select Top 1 FE_CedulaEmisor From GAP_2.DBO.SeriesCamposLibres Where Nullif(FE_CedulaEmisor, '') Is Not Null) as empresa,	
 		SuPedido as documento, Coalesce(PCL.WMS_Tipo, 'Regular') as tipo, GetDate() as transmitido
-		From	GAP_2.DBO.PedCompraCab as PC
-		Join	GAP_2.DBO.PedCompraCamposLibres as PCL on PC.NumSerie = PCL.NumSerie and PC.NumPedido = PCL.NumPedido and PC.N = PCL.N
+		From	MULTIBRANDS_GAP.DBO.PedCompraCab as PC
+		Join	MULTIBRANDS_GAP.DBO.PedCompraCamposLibres as PCL on PC.NumSerie = PCL.NumSerie and PC.NumPedido = PCL.NumPedido and PC.N = PCL.N
 
-
+-- agregar  campo libre WMS_Tipo
 Select * from Catalogos.PedCompraCab where Documento='21068173-EITU'
 Select * from Catalogos.PedCompraLin where Documento='21068173-EITU'
 

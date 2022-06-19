@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Quartz" Version="3.4.0" />
     <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
   </ItemGroup>
 
@@ -12,10 +13,6 @@
     <ProjectReference Include="..\WMS_3PL_IntegrationService.DAL\WMS_3PL_IntegrationService.DAL.csproj" />
     <ProjectReference Include="..\WMS_3PL_IntegrationService.ENTITY\WMS_3PL_IntegrationService.ENTITY.csproj" />
     <ProjectReference Include="..\WMS_3PL_IntegrationService.UTILITY\WMS_3PL_IntegrationService.UTILITY.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="AjusteInventario\" />
   </ItemGroup>
 
 </Project>

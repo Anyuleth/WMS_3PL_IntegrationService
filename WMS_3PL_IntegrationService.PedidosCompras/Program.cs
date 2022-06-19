@@ -6,6 +6,7 @@ using Quartz;
 using WMS_3PL_IntegrationService.PedidosCompras.Jobs;
 using Microsoft.Extensions.Configuration;
 using System.IO;
+using System.Configuration;
 
 namespace WMS_3PL_IntegrationService.PedidosCompras
 {
@@ -25,7 +26,7 @@ namespace WMS_3PL_IntegrationService.PedidosCompras
                         .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
                          IConfiguration configuration = builder.Build();
 
-                         string intervalo = (configuration["IntervaloServicio"]);
+                         string intervalo = ConfigurationManager.AppSettings["IntervaloServicio"].ToString();
                          services.AddQuartz(q =>
                          {
                              q.UseMicrosoftDependencyInjectionScopedJobFactory();

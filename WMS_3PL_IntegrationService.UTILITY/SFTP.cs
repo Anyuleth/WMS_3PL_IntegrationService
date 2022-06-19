@@ -4,13 +4,16 @@ using Renci.SshNet.Sftp;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Configuration;
+using Microsoft.IdentityModel.Protocols;
+using System.Linq;
 
 namespace WMS_3PL_IntegrationService.UTILITY
 {
     public class SFTP
     {
 
-        public static void SendSFTP(string XMLfile, string NameFile )
+        public static void SendSFTP(string XMLfile, string NameFile, out bool enviadoSFTP, out string mensaje)
         {
 
             try
@@ -18,13 +21,13 @@ namespace WMS_3PL_IntegrationService.UTILITY
                 var builder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
                 IConfiguration configuration = builder.Build();
 
-
-
-                var hostName = (configuration["HostSFTP"]);//@"172.23.24.54";
-                var userName = (configuration["Usuario"]);//"anyuleth.cortes";
-                var portNumber = (configuration["Puerto"]);//"22";
-                var password = (configuration["pass"]);//@"_vNNtL%x;rkb9/G}";
-                var sftpDestinationUrl  = (configuration["FromWMS"]); //@"/FromWMS/";
+                var enviado = false;
+                var notificacion = string.Empty;
+                var hostName = ConfigurationManager.AppSettings["HostSFTP"].ToString();
+                var userName = ConfigurationManager.AppSettings["Usuario"].ToString();
+                var portNumber = ConfigurationManager.AppSettings["Puerto"].ToString();
+                var password = ConfigurationManager.AppSettings["pass"].ToString();
+                var sftpDestinationUrl  = ConfigurationManager.AppSettings["ToWMS"].ToString();
 
                 SftpClient client = new SftpClient(hostName, userName, password);
              
@@ -42,18 +45,24 @@ namespace WMS_3PL_IntegrationService.UTILITY
                         if (!client.Exists(fileSftp))
                         {
                             client.UploadFile(file1, fileSftp, null);
+                            enviado = true;
+                            notificacion = "Envio al SFTP con éxito";
                         }
                         else
                         {
-                          //  Notification.SaveNotification(new ENTITY.Notification("Library: Class: UploadSFTP - Method: SFTP", "El archivo: " + fileSftp + " ya fue enviado.  "));
+                            enviado = false;
+                            notificacion = "Enviado anteriormente al SFTP";
                         }
                     }
                 }
-
+                enviadoSFTP = enviado;
+                mensaje = notificacion;
             }
             catch (Exception ex)
             {
-               // Error.SaveError(new ENTITY.Error("Library: Class: UploadSFTP - Method: SFTP ", ex.ToString()));
+                enviadoSFTP = false;
+                mensaje = ex.ToString();
+                // Error.SaveError(new ENTITY.Error("Library: Class: UploadSFTP - Method: SFTP ", ex.ToString()));
 
             }
 
@@ -66,11 +75,13 @@ namespace WMS_3PL_IntegrationService.UTILITY
         /// </summary>
         private void listFiles()
         {
-            string host = @"172.23.24.54";
-            string username = "anyuleth.cortes";
-            string password = @"cc3s3f1126..";
-    
-            string remoteDirectory = "/toWMS";
+            string host = ConfigurationManager.AppSettings["HostSFTP"].ToString();
+            string username = ConfigurationManager.AppSettings["Usuario"].ToString();
+            string password = ConfigurationManager.AppSettings["pass"].ToString();
+            string archivo = ConfigurationManager.AppSettings["NombreArchivoXML"].ToString();
+            
+
+            string remoteDirectory = ConfigurationManager.AppSettings["FromWMS"].ToString(); ;
 
             using (SftpClient sftp = new SftpClient(host, username, password))
             {
@@ -80,10 +91,7 @@ namespace WMS_3PL_IntegrationService.UTILITY
 
                     var files = sftp.ListDirectory(remoteDirectory);
 
-                    foreach (var file in files)
-                    {
-                        Console.WriteLine(file.Name);
-                    }
+                    var x=files.Where(f => f.Name.Contains(archivo)).OrderByDescending(o => o.LastWriteTime).Take(1);
 
                     sftp.Disconnect();
                 }

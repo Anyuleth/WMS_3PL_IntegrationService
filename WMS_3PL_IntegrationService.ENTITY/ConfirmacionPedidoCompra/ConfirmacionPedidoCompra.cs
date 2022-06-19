@@ -41,4 +41,8 @@ namespace WMS_3PL_IntegrationService.ENTITY.ConfirmacionPedidoCompra
     [XmlElement("articulo")]
     public List<ConfirmacionPedidoCompra> Lista_articulos { get; set; }
     }
+
+
+    
+
 }

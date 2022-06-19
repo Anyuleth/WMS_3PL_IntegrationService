@@ -12,13 +12,15 @@ namespace WMS_3PL_IntegrationService.BLL.Precios
         {
             try
             {
+                var enviadoSFTP = false;
+                var mensaje = string.Empty;
                 ENTITY.Precios.Precios precios = new ENTITY.Precios.Precios();
                 precios.Lista_Precios = DAL.Precios.Precios.ObtenerPreciosPendientes();
                 XmlSerializer serialiser = new XmlSerializer(typeof(ENTITY.Precios.Precios));
 
                 UTILITY.XML.CreateXML(@"C:\Program Files (x86)\AR Holdings\3PL\Precios.xml", precios, serialiser);
 
-                UTILITY.SFTP.SendSFTP(@"C:\Program Files (x86)\AR Holdings\3PL\", "Precios.xml");
+                UTILITY.SFTP.SendSFTP(@"C:\Program Files (x86)\AR Holdings\3PL\", "Precios.xml",out enviadoSFTP, out mensaje);
 
             }
             catch (Exception ex)

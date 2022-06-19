@@ -1,34 +1,81 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.IO;
 using System.Text;
 using System.Xml.Serialization;
+using WMS_3PL_IntegrationService.ENTITY.PedidosCompras;
 
 namespace WMS_3PL_IntegrationService.BLL.PedidosCompras
 {
     public class SendData
     {
+        
         public static void SendWMS_3PLPedidos()
         {
+            
+
             try
             {
-                List<ENTITY.PedidosCompras.PedidosCompra> pedidos = new List<ENTITY.PedidosCompras.PedidosCompra>();
-                pedidos = DAL.PedidosCompras.PedidosCompras.ObtenerPedidosPendientes();
-                
+                List<ENTITY.PedidosCompras.Encabezaddo> encabezados = new List<ENTITY.PedidosCompras.Encabezaddo>();
+                encabezados = DAL.PedidosCompras.PedidosCompras.ObtenerPedidosPendientes();
 
-                foreach (var item in pedidos)
+               
+
+                if (encabezados.Count>0)
                 {
-                
-                    item.Linea = DAL.PedidosCompras.PedidosCompras.ObtenerPedidosDetallePendientes();
-                  
 
-                  
+                    var carpeta = ConfigurationManager.AppSettings["CarpetaPedidos"].ToString();
+                    var nombreArchivoXML = ConfigurationManager.AppSettings["NombreArchivoXML"].ToString();
+                    var extencionArchivoXML = ConfigurationManager.AppSettings["ExtencionArchivoXML"].ToString();
+
+                    var anno = DateTime.Today.Year;
+                    var mes = DateTime.Now.ToString("MMMM");
+                    var dia = DateTime.Today.Day;
+
+                    var carpetaPedidos = carpeta + anno + "\\" + mes + "\\" + dia + "\\";
+                    System.IO.FileInfo file = new System.IO.FileInfo(carpetaPedidos);
+                    file.Directory.Create();
+
+                    List<ENTITY.PedidosCompras.Lineas> lineas = new List<ENTITY.PedidosCompras.Lineas>();
+                    foreach (var item in encabezados)
+                    {
+
+                        var enviadoSFTP=false;
+                        var mensaje = string.Empty;
+                        lineas = DAL.PedidosCompras.PedidosCompras.ObtenerPedidosDetallePendientes(item.IdPedido);
+                        
+                        Encabezaddo encabezado = new Encabezaddo();
+                        encabezado.Empresa = item.Empresa;
+                        encabezado.Documento = item.Documento;
+                        encabezado.Tipo = item.Tipo;
+                        encabezado.Fecha_Entrada = item.Fecha_Entrada;
+                        encabezado.Fecha_transmision = item.Fecha_transmision;
+
+                        Detalle detalle = new Detalle();
+                        detalle.Lineas = lineas;
+
+                        ENTITY.PedidosCompras.PedidosCompras pedidos = new ENTITY.PedidosCompras.PedidosCompras();
+                        pedidos.Encabezado = encabezado;
+                        pedidos.Detalle = detalle;
+                        
+                        XmlSerializer serialiser = new XmlSerializer(typeof(ENTITY.PedidosCompras.PedidosCompras));
+                        UTILITY.XML.CreateXML(carpetaPedidos + nombreArchivoXML  + item.Serie + extencionArchivoXML, pedidos, serialiser);
+
+                        UTILITY.SFTP.SendSFTP(carpetaPedidos, nombreArchivoXML + item.Serie + extencionArchivoXML, out enviadoSFTP, out mensaje);
+
+                        if (enviadoSFTP)
+                        {
+                            DAL.PedidosCompras.PedidosCompras.ModificarEstadoPedido(item.IdPedido, "ENVIADO", mensaje);
+
+                        }
+                        else
+                        {
+                            DAL.PedidosCompras.PedidosCompras.ModificarEstadoPedido(item.IdPedido, "ENVIADO", mensaje);
+                        }
+                    }
                 }
-                XmlSerializer serialiser = new XmlSerializer(typeof(ENTITY.PedidosCompras.PedidosCompra));
-                UTILITY.XML.CreateXML(@"C:\Program Files (x86)\AR Holdings\3PL\PedidosCompras.xml", pedidos, serialiser);
-
-                //UTILITY.SFTP.SendSFTP(@"C:\Program Files (x86)\AR Holdings\3PL\PedidosCompras.xml");
-
-
 
             }
             catch (Exception ex)

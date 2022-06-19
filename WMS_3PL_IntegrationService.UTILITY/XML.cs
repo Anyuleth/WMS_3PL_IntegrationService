@@ -10,17 +10,30 @@ namespace WMS_3PL_IntegrationService.UTILITY
     public class XML
     {
       
-        public static void CreateXML(string fileName, object objectName, XmlSerializer serialiser)
+
+        public static void CreateXML(string fileName, object objectName, XmlSerializer serializer)
         {
+           
 
             TextWriter Filestream = new StreamWriter(fileName);
             XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
             ns.Add("", "");
-            serialiser.Serialize(Filestream, objectName, ns);
+            serializer.Serialize(Filestream, objectName, ns);
 
             Filestream.Close();
 
 
         }
+
+        public static T DeserializeToObject<T>(string filepath) where T : class
+        {
+            System.Xml.Serialization.XmlSerializer ser = new System.Xml.Serialization.XmlSerializer(typeof(T));
+
+            using (StreamReader sr = new StreamReader(filepath))
+            {
+                return (T)ser.Deserialize(sr);
+            }
+        }
+      
     }
 }
