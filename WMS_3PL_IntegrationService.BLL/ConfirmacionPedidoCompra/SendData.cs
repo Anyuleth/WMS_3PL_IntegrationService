@@ -7,6 +7,8 @@ using System.Xml.Serialization;
 using WMS_3PL_IntegrationService.UTILITY;
 using WMS_3PL_IntegrationService.ENTITY.ConfirmacionPedidoCompra;
 using System.Linq;
+using Renci.SshNet;
+using System.IO;
 
 namespace WMS_3PL_IntegrationService.BLL.ConfirmacionPedidoCompra
 {
@@ -17,53 +19,27 @@ namespace WMS_3PL_IntegrationService.BLL.ConfirmacionPedidoCompra
         {
             try
             {
-                //CONECTARSE AL SFTP PARA LEER ESE ARCHIVO
-
-                string carpeta = ConfigurationManager.AppSettings["CarpetaPedidos"].ToString();
-             
-
                 var cadenaDeConexion = DAL.Herramientas.CreaCadena(servidorBD, nombreBD, usuarioBD, contrasennaBD);
+                string extension = ConfigurationManager.AppSettings["ExtencionArchivoXML"].ToString();
+                string archivo = ConfigurationManager.AppSettings["NombreArchivoXML"].ToString();
+                string carpeta = ConfigurationManager.AppSettings["CarpetaPedidos"].ToString();
 
-                var pedido = XML.DeserializeToObject<ENTITY.ConfirmacionPedidoCompra.ConfirmacionPedidoCompras>(carpeta) ;
-                var documento = pedido.Lista_articulos.Select(x => x.Documento).FirstOrDefault();
-                var fecha = pedido.Lista_articulos.Select(x => x.Fecha_Transmision).FirstOrDefault();
+                var anno = DateTime.Today.Year;
+                var mes = DateTime.Now.ToString("MMMM");
+                var dia = DateTime.Today.Day;
 
+                var carpetaPedidos = carpeta + anno + "\\" + mes + "\\" + dia + "\\";
+                System.IO.FileInfo file = new System.IO.FileInfo(carpetaPedidos);
+                file.Directory.Create();
 
-                var jsonPedido = Newtonsoft.Json.JsonConvert.SerializeObject(pedido);
-
-
-                //1.validar que el pedido no tenga un albaran creado
-                var existeAlbaran = DAL.ConfirmacionPedidoCompra.ConfirmacionPedidoCompra.ValidarAlbaranExiste(cadenaDeConexion, documento);
                
-                if (!existeAlbaran)
+
+                var readFile=UTILITY.SFTP.DownloadFile(archivo, carpetaPedidos, extension);
+                if (readFile)
                 {
-                    //2.validar lineas del pedido recibido contra las lineas del pedido decompra enviado
-                    var diferenciasPedido= DAL.ConfirmacionPedidoCompra.ConfirmacionPedidoCompra.DireferenciaPedidoCompras(jsonPedido, documento);
-
-                    if (!diferenciasPedido.Diferencias)
-                    {
-                        //Crear el albarán de compra para ese pedido
-                        DAL.ConfirmacionPedidoCompra.ConfirmacionPedidoCompra.CrearAlbaranCompra(cadenaDeConexion, documento, fecha);
-
-                        //Hacer tabla para insertar los archivos procesados y Marcar el pedido de compra como procesado para no leerlo mas .
-                        DAL.ConfirmacionPedidoCompra.ConfirmacionPedidoCompra.GuardarArchivoProcesado(pedido);
-
-                       
-                    }
-                    else
-                    {
-                        UTILITY.Notificacion.MailNotification("Pedido con diferencias", "Ya existe un albaran para el pedido "+ documento);
-                    }
-                
+                    ProcesarPedidoCompra(carpetaPedidos + archivo + extension, cadenaDeConexion, archivo);
                 }
-                else
-                {
-                    //sino envia notificacion con el error de que ya existe albaran para ese pedi
-                    UTILITY.Notificacion.MailNotification("Pedido ya existe","Ya existe un albaran para el pedido " + documento);
-                }
-
-
-                
+              
             }
             catch (Exception ex)
             {
@@ -73,7 +49,49 @@ namespace WMS_3PL_IntegrationService.BLL.ConfirmacionPedidoCompra
             }
 
         }
+
       
 
+        public static void ProcesarPedidoCompra(string carpeta, string cadenaDeConexion, string archivo)
+        {
+            var pedido = XML.DeserializeToObject<ENTITY.ConfirmacionPedidoCompra.ConfirmacionPedidoCompras>(carpeta);
+            var documento = pedido.Lista_articulos.Select(x => x.Documento).FirstOrDefault();
+            var fecha = pedido.Lista_articulos.Select(x => x.Fecha_Transmision).FirstOrDefault();
+
+
+            var jsonPedido = Newtonsoft.Json.JsonConvert.SerializeObject(pedido);
+
+
+            //1.validar que el pedido no tenga un albaran creado
+            var existeAlbaran = DAL.ConfirmacionPedidoCompra.ConfirmacionPedidoCompra.ValidarAlbaranExiste(cadenaDeConexion, documento);
+
+            if (!existeAlbaran)
+            {
+                //2.validar lineas del pedido recibido contra las lineas del pedido decompra enviado
+                var diferenciasPedido = DAL.ConfirmacionPedidoCompra.ConfirmacionPedidoCompra.DireferenciaPedidoCompras(jsonPedido, documento);
+
+                if (!diferenciasPedido.Diferencias)
+                {
+                    //Crear el albarán de compra para ese pedido
+                    DAL.ConfirmacionPedidoCompra.ConfirmacionPedidoCompra.CrearAlbaranCompra(cadenaDeConexion, documento, fecha);
+
+                    //mover el archivo a carpeta procesada para ya no leerlo mas
+                    UTILITY.SFTP.MoveFileToProcessed(archivo);
+
+
+                }
+                else
+                {
+                    UTILITY.Notificacion.MailNotification("Pedido con diferencias", "Ya existe un albaran para el pedido " + documento);
+                }
+
+            }
+            else
+            {
+                //sino envia notificacion con el error de que ya existe albaran para ese pedi
+                UTILITY.Notificacion.MailNotification("Pedido ya existe", "Ya existe un albaran para el pedido " + documento);
+            }
+
+        }
     }
 }

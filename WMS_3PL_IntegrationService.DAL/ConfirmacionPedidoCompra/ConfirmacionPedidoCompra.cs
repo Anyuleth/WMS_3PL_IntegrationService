@@ -35,31 +35,7 @@ namespace WMS_3PL_IntegrationService.DAL.ConfirmacionPedidoCompra
         }
         #endregion
 
-        #region Guardar el archivo procesado en base datos de BTOB
-        public static bool GuardarArchivoProcesado(ENTITY.ConfirmacionPedidoCompra.ConfirmacionPedidoCompras pedido)
-        {
-            var resultado = false;
-            try
-            {
-                using var context = new DAL.WMS_3PL_Context();
-
-                var paramList = new[] {
-                    new SqlParameter("@Pedido", pedido)};
-
-
-                context.Database.ExecuteSqlRaw("EXEC PedidosCompra.SP_CrearAlbaran_PedidoCompra @Pedido", parameters: paramList);
-
-
-            }
-            catch (Exception ex)
-            {
-                var mensajeError = ex.InnerException != null ? ex.Message + ", " + ex.InnerException.Message : ex.Message;
-                DAL.Herramientas.GuardarError(new ENTITY.Errores.Errores("Libreria: BLL - Clase: PedidosCompras - Metodo: ModificarEstadoPedido", mensajeError.ToString()));
-            }
-            return resultado;
-        }
-        #endregion
-
+     
         #region Valida si existe un albaran para el pedido enviado
         public static bool ValidarAlbaranExiste(string connectionString, string documento)
         {

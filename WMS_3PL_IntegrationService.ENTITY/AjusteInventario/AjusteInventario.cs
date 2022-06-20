@@ -11,7 +11,7 @@ namespace WMS_3PL_IntegrationService.ENTITY.AjusteInventario
         public string Empresa { get; set; }
 
         [XmlElement("fecha")]
-        public string Fecha { get; set; }
+        public DateTime Fecha { get; set; }
 
         [XmlElement("producto")]
         public string Producto { get; set; }
@@ -29,15 +29,15 @@ namespace WMS_3PL_IntegrationService.ENTITY.AjusteInventario
         public string Comentarios { get; set; }
 
         [XmlElement("fecha_transmision")]
-        public string Fecha_transmision { get; set; }
+        public DateTime Fecha_transmision { get; set; }
 
 
     }
 
-    [XmlRootAttribute(ElementName = "detalle_articulos", IsNullable = false)]
+    [XmlRootAttribute(ElementName = "ajuste_inventario", IsNullable = false)]
     public class AjusteInventarios
     {
-        [XmlElement("ajuste_inventario")]
+        [XmlElement("detalle_articulos")]
         public List<AjusteInventario> Lista_ajusteInventario { get; set; }
     }
 }
