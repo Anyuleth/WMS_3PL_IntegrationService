@@ -9,7 +9,7 @@ namespace WMS_3PL_IntegrationService.DAL.ConfirmacionPedidoCompra
 {
     public class ConfirmacionPedidoCompra
     {
-        #region Crea el albaran de compra
+        #region Crea el albaran de compra en base de datos de gestion
         public static void CrearAlbaranCompra(string connectionString,string pedido, DateTime fecha)
         {
             var resultado = false;
@@ -34,9 +34,8 @@ namespace WMS_3PL_IntegrationService.DAL.ConfirmacionPedidoCompra
           
         }
         #endregion
-
-     
-        #region Valida si existe un albaran para el pedido enviado
+             
+        #region Valida si existe un albaran para el pedido enviado en la base de gestion
         public static bool ValidarAlbaranExiste(string connectionString, string documento)
         {
             var resultado = false;
@@ -67,7 +66,7 @@ namespace WMS_3PL_IntegrationService.DAL.ConfirmacionPedidoCompra
         }
         #endregion
 
-        #region Compara el pedido del archivo recibido contra el pedido en base de datos del btob
+        #region Compara el pedido del archivo recibido contra el pedido en base de datos del btob y devuelve las diferencias
         public static ENTITY.ConfirmacionPedidoCompra.RespuestaConfirmacionPedidoCompra DireferenciaPedidoCompras(string pedido, string documento)
         {
             ENTITY.ConfirmacionPedidoCompra.RespuestaConfirmacionPedidoCompra resultado= new ENTITY.ConfirmacionPedidoCompra.RespuestaConfirmacionPedidoCompra();

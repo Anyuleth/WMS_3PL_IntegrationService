@@ -7,6 +7,7 @@ namespace WMS_3PL_IntegrationService.BLL.CodigoBarras
 {
     public class SendData
     {
+        #region Envia los codigos de barras al SFTP
         public static void SendWMS_3PLCodigoBarras()
         {
             try
@@ -32,5 +33,7 @@ namespace WMS_3PL_IntegrationService.BLL.CodigoBarras
 
 
         }
+        #endregion
+
     }
 }

@@ -11,7 +11,7 @@ namespace WMS_3PL_IntegrationService.DAL.Clientes
 {
     public class Clientes
     {
-        #region Obtener los articulos pendientes de enviar 
+        #region Obtener los clientes pendientes de enviar al SFTP
         public static List<ENTITY.Cliente> ObtenerClientesPendientes()
         {
 

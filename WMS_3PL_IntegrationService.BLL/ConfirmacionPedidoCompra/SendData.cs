@@ -14,7 +14,7 @@ namespace WMS_3PL_IntegrationService.BLL.ConfirmacionPedidoCompra
 {
     public class SendData
     {
-
+        #region Compara los pedidos de compra del BTOB con los del  SFTP
         public static void CheckWMS_3PLPedidos(string servidorBD, string nombreBD, string usuarioBD, string contrasennaBD)
         {
             try
@@ -32,14 +32,14 @@ namespace WMS_3PL_IntegrationService.BLL.ConfirmacionPedidoCompra
                 System.IO.FileInfo file = new System.IO.FileInfo(carpetaPedidos);
                 file.Directory.Create();
 
-               
 
-                var readFile=UTILITY.SFTP.DownloadFile(archivo, carpetaPedidos, extension);
+
+                var readFile = UTILITY.SFTP.DownloadFile(archivo, carpetaPedidos, extension);
                 if (readFile)
                 {
                     ProcesarPedidoCompra(carpetaPedidos + archivo + extension, cadenaDeConexion, archivo);
                 }
-              
+
             }
             catch (Exception ex)
             {
@@ -49,9 +49,9 @@ namespace WMS_3PL_IntegrationService.BLL.ConfirmacionPedidoCompra
             }
 
         }
+        #endregion
 
-      
-
+        #region Procesa los archivos si el pedido de confirmacion es correcto, creará albaran de compra
         public static void ProcesarPedidoCompra(string carpeta, string cadenaDeConexion, string archivo)
         {
             var pedido = XML.DeserializeToObject<ENTITY.ConfirmacionPedidoCompra.ConfirmacionPedidoCompras>(carpeta);
@@ -93,5 +93,9 @@ namespace WMS_3PL_IntegrationService.BLL.ConfirmacionPedidoCompra
             }
 
         }
+        #endregion
+
+
+
     }
 }

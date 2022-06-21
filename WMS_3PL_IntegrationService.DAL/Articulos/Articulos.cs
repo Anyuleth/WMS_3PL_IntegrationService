@@ -12,7 +12,7 @@ namespace WMS_3PL_IntegrationService.DAL.Articulos
 {
     public class Articulos
     {
-        #region Obtener los articulos pendientes de enviar 
+        #region Obtener los articulos pendientes de enviar al SFTP
         public static List<ENTITY.Articulo> ObtenerArticulosPendientes()
         {
 
@@ -40,8 +40,7 @@ namespace WMS_3PL_IntegrationService.DAL.Articulos
         }
         #endregion
 
-
-        #region Obtener los articulos pendientes de enviar 
+        #region Obtener los codigos de articulos pendientes de enviar  al SFTP
         public static List<ENTITY.CodigoArticulo> ObtenerCodArticulosPendientes()
         {
 

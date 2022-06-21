@@ -12,7 +12,7 @@ namespace WMS_3PL_IntegrationService.DAL.PedidosCompras
 {
     public class PedidosCompras
     {
-        #region Obtener los encabezados de los pedidos pendientes de enviar 
+        #region Obtener los encabezados de los pedidos pendientes de enviar al SFTP
         public static List<ENTITY.PedidosCompras.Encabezaddo> ObtenerPedidosPendientes()
         {
 
@@ -37,7 +37,7 @@ namespace WMS_3PL_IntegrationService.DAL.PedidosCompras
         }
         #endregion
 
-        #region Obtener los pedidos pendientes de enviar 
+        #region Obtener los detalles pedidos pendientes de enviar 
         public static List<ENTITY.PedidosCompras.Lineas> ObtenerPedidosDetallePendientes(string idPedido)
         {
 
@@ -64,7 +64,7 @@ namespace WMS_3PL_IntegrationService.DAL.PedidosCompras
         }
         #endregion
 
-        #region Validar si existe factura
+        #region Cambiar el estado del pedido
         public static bool ModificarEstadoPedido(string idPedido, string estado, string mensaje)
         {
             var resultado = false;

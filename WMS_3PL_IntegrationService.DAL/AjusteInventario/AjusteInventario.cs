@@ -8,10 +8,9 @@ namespace WMS_3PL_IntegrationService.DAL.AjusteInventario
 {
     public class AjusteInventario
     {
-        #region Crea el inventario
+        #region Crea el inventario en base de datos de gestion
         public static void CrearInventario(string connectionString,string codAlmacen, string inventario, DateTime fecha)
         {
-            var resultado = false;
             try
             {
                 using var context = new DAL.WMS_3PL_Context(connectionString);

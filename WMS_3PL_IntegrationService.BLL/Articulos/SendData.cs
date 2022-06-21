@@ -7,6 +7,7 @@ namespace WMS_3PL_IntegrationService.BLL.Articulos
 {
     public class SendData
     {
+        #region Enviar los articulos al SFTP
         public static void SendWMS_3PLArticulos()
         {
             try
@@ -20,7 +21,7 @@ namespace WMS_3PL_IntegrationService.BLL.Articulos
 
                 UTILITY.XML.CreateXML(@"C:\Program Files (x86)\AR Holdings\3PL\Articulos.xml", articulos, serialiser);
 
-                UTILITY.SFTP.SendSFTP(@"C:\Program Files (x86)\AR Holdings\3PL\", "Articulos.xml",out enviadoSFTP, out mensaje);
+                UTILITY.SFTP.SendSFTP(@"C:\Program Files (x86)\AR Holdings\3PL\", "Articulos.xml", out enviadoSFTP, out mensaje);
 
             }
             catch (Exception ex)
@@ -32,6 +33,8 @@ namespace WMS_3PL_IntegrationService.BLL.Articulos
 
 
         }
-       
+        #endregion
+
+
     }
 }

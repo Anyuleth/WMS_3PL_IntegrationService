@@ -10,7 +10,7 @@ namespace WMS_3PL_IntegrationService.DAL.Precios
 {
     public class Precios
     {
-        #region Obtener los precios pendientes de enviar 
+        #region Obtener los precios pendientes de enviar al SFTP
         public static List<ENTITY.Precios.PreciosU> ObtenerPreciosPendientes()
         {
 

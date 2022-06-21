@@ -9,7 +9,8 @@ namespace WMS_3PL_IntegrationService.BLL.AjusteInventario
 {
     public class SendData
     {
-        //Leer el archivo “Ajuste Inventario.xml“ y ajustar el inventario con el procedimiento[WMS].[SP_CrearInventarios] en las bases de datos de Gestión.
+
+        #region Leer el archivo “Ajuste Inventario.xml“ y ajustar el inventario con el procedimiento[WMS].[SP_CrearInventarios] en las bases de datos de Gestión.
         public static void CheckWMS_3PLInventario(string servidorBD, string nombreBD, string usuarioBD, string contrasennaBD)
         {
             try
@@ -39,14 +40,15 @@ namespace WMS_3PL_IntegrationService.BLL.AjusteInventario
             catch (Exception ex)
             {
                 var mensaje = ex.InnerException != null ? ex.Message + ", " + ex.InnerException.Message : ex.Message;
-                DAL.Herramientas.GuardarError(new ENTITY.Errores.Errores("Libreria: BLL - Clase: ProcessData - Metodo: SendWMS_3PLPedidos", mensaje.ToString()));
+                DAL.Herramientas.GuardarError(new ENTITY.Errores.Errores("Libreria: BLL - Clase: SendData - Metodo: CheckWMS_3PLInventario", mensaje.ToString()));
 
             }
 
         }
 
+        #endregion
 
-
+        #region Procesa el archivo de ajuste de inventario ymueve al archivo a otra carpeta para no procesarlo mas 
         public static void ProcesarAjusteInvenatario(string carpeta, string cadenaDeConexion, string archivo)
         {
             var ajusteInventario = XML.DeserializeToObject<ENTITY.AjusteInventario.AjusteInventarios>(carpeta);
@@ -58,15 +60,15 @@ namespace WMS_3PL_IntegrationService.BLL.AjusteInventario
             var jsonAjusteInventario = Newtonsoft.Json.JsonConvert.SerializeObject(ajusteInventario);
 
 
-            //Crear el albarán de compra para ese pedido
-            DAL.AjusteInventario.AjusteInventario.CrearInventario(cadenaDeConexion, codAlmacen, jsonAjusteInventario,fecha);
+            DAL.AjusteInventario.AjusteInventario.CrearInventario(cadenaDeConexion, codAlmacen, jsonAjusteInventario, fecha);
 
-            //mover el archivo a carpeta procesada para ya no leerlo mas
             UTILITY.SFTP.MoveFileToProcessed(archivo);
 
 
-              
+
 
         }
+        #endregion
+
     }
 }

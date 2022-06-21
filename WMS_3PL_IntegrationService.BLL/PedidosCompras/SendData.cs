@@ -14,16 +14,16 @@ namespace WMS_3PL_IntegrationService.BLL.PedidosCompras
         
         public static void SendWMS_3PLPedidos()
         {
-            
 
+            #region Enviar los pedidos de compras creados en ICG Manager y enviarlos al BTOB para enviarlos al SFTP
             try
             {
                 List<ENTITY.PedidosCompras.Encabezaddo> encabezados = new List<ENTITY.PedidosCompras.Encabezaddo>();
                 encabezados = DAL.PedidosCompras.PedidosCompras.ObtenerPedidosPendientes();
 
-               
 
-                if (encabezados.Count>0)
+
+                if (encabezados.Count > 0)
                 {
 
                     var carpeta = ConfigurationManager.AppSettings["CarpetaPedidos"].ToString();
@@ -42,10 +42,10 @@ namespace WMS_3PL_IntegrationService.BLL.PedidosCompras
                     foreach (var item in encabezados)
                     {
 
-                        var enviadoSFTP=false;
+                        var enviadoSFTP = false;
                         var mensaje = string.Empty;
                         lineas = DAL.PedidosCompras.PedidosCompras.ObtenerPedidosDetallePendientes(item.IdPedido);
-                        
+
                         Encabezaddo encabezado = new Encabezaddo();
                         encabezado.Empresa = item.Empresa;
                         encabezado.Documento = item.Documento;
@@ -59,9 +59,9 @@ namespace WMS_3PL_IntegrationService.BLL.PedidosCompras
                         ENTITY.PedidosCompras.PedidosCompras pedidos = new ENTITY.PedidosCompras.PedidosCompras();
                         pedidos.Encabezado = encabezado;
                         pedidos.Detalle = detalle;
-                        
+
                         XmlSerializer serialiser = new XmlSerializer(typeof(ENTITY.PedidosCompras.PedidosCompras));
-                        UTILITY.XML.CreateXML(carpetaPedidos + nombreArchivoXML  + item.Serie + extencionArchivoXML, pedidos, serialiser);
+                        UTILITY.XML.CreateXML(carpetaPedidos + nombreArchivoXML + item.Serie + extencionArchivoXML, pedidos, serialiser);
 
                         UTILITY.SFTP.SendSFTP(carpetaPedidos, nombreArchivoXML + item.Serie + extencionArchivoXML, out enviadoSFTP, out mensaje);
 
@@ -87,6 +87,8 @@ namespace WMS_3PL_IntegrationService.BLL.PedidosCompras
 
 
         }
-       
+        #endregion
+
+
     }
 }
