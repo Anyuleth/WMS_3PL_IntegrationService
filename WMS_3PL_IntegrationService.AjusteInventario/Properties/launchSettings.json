@@ -1,7 +1,8 @@
-﻿{
+{
   "profiles": {
     "WMS_3PL_IntegrationService.AjusteInventario": {
       "commandName": "Project",
+      "commandLineArgs": "MULTIBRANDS_GAP",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
       }

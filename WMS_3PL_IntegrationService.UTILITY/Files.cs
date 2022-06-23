@@ -15,7 +15,7 @@ namespace WMS_3PL_IntegrationService.UTILITY
         public static void LogInformation(string source, string log)
         {
             var fecha = string.Format("{0:yyyy-MM-dd}", DateTime.Today);
-            string logFile = AppDomain.CurrentDomain.BaseDirectory + fecha + " - LogErrores.txt";
+            string logFile = AppDomain.CurrentDomain.BaseDirectory + fecha + " - LogInformation.txt";
 
             StreamWriter sw = new StreamWriter(logFile, true);
             sw.WriteLine("********** {0} **********", DateTime.Now);

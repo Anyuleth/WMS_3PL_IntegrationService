@@ -9,6 +9,7 @@ using System.IO;
 using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
+using System.Configuration;
 
 namespace WMS_3PL_IntegrationService.ConfirmacionPedidoCompra
 {
@@ -21,7 +22,7 @@ namespace WMS_3PL_IntegrationService.ConfirmacionPedidoCompra
             try
             {
                
-                CreateHostBuilder(args).Build().Run();
+                CreateHostBuilder(parameters).Build().Run();
             }
             catch (Exception ex)
             {
@@ -34,14 +35,11 @@ namespace WMS_3PL_IntegrationService.ConfirmacionPedidoCompra
                  Host.CreateDefaultBuilder(args)
                      .ConfigureServices((hostContext, services) =>
                      {
-                         var builder = new ConfigurationBuilder()
-                        .SetBasePath(Directory.GetCurrentDirectory())
-                        .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
-                         IConfiguration configuration = builder.Build();
+                         
 
-                         string intervalo = (configuration["IntervaloServicio"]);
+                         string intervalo = ConfigurationManager.AppSettings["IntervaloServicio"].ToString();//(configuration["IntervaloServicio"]);
 
-                         UTILITY.Files.LogInformation(intervalo, "Main ");
+                         UTILITY.Files.LogInformation(intervalo, "Main Intervalo");
                          services.AddQuartz(q =>
                          {
                              q.UseMicrosoftDependencyInjectionScopedJobFactory();
@@ -53,11 +51,6 @@ namespace WMS_3PL_IntegrationService.ConfirmacionPedidoCompra
                              UTILITY.Files.LogInformation(args[0].ToString(), "args[0] ");
                              UTILITY.Files.LogInformation(args[1].ToString(), " args[1]");
                              q.AddJob<ConfirmacionPedidoCompraJob>(opts => opts.WithIdentity(jobKey));
-
-                             //q.AddTrigger(opts => opts
-                             //.ForJob(jobKey)
-                             //.WithIdentity("CodigoBarrasJob-trigger") // give the trigger a unique name
-                             // .WithCronSchedule(intervalo));
 
                              // Create a trigger for the job
                              q.AddTrigger(opts => opts

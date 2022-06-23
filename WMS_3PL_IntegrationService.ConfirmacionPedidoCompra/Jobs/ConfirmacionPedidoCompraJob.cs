@@ -28,7 +28,7 @@ namespace WMS_3PL_IntegrationService.ConfirmacionPedidoCompra.Jobs
                 string servidorBD = ConfigurationManager.AppSettings["Server"].ToString(); 
                 string nombreBD = args;
                 string usuarioBD = ConfigurationManager.AppSettings["User"].ToString();
-                string contrasennaBD = ConfigurationManager.AppSettings["Password"].ToString();
+                string contrasennaBD = ConfigurationManager.AppSettings["PassServer"].ToString();
 
                 BLL.ConfirmacionPedidoCompra.SendData.CheckWMS_3PLPedidos(servidorBD, nombreBD, usuarioBD, contrasennaBD);
                 UTILITY.Files.LogInformation(args, "Execute Job");

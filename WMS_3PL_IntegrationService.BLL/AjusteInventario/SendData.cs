@@ -52,8 +52,8 @@ namespace WMS_3PL_IntegrationService.BLL.AjusteInventario
         public static void ProcesarAjusteInvenatario(string carpeta, string cadenaDeConexion, string archivo)
         {
             var ajusteInventario = XML.DeserializeToObject<ENTITY.AjusteInventario.AjusteInventarios>(carpeta);
-
-            var codAlmacen = ajusteInventario.Lista_ajusteInventario.Select(x => x.Bodega).FirstOrDefault();
+            
+            var codAlmacen = ajusteInventario.Lista_ajusteInventario.Select(x => x.Bodega).FirstOrDefault().Split('-').Last();
             var fecha = ajusteInventario.Lista_ajusteInventario.Select(x => x.Fecha).FirstOrDefault();
 
 

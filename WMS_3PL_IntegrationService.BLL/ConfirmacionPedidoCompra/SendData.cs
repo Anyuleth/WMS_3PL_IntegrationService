@@ -82,7 +82,7 @@ namespace WMS_3PL_IntegrationService.BLL.ConfirmacionPedidoCompra
                 }
                 else
                 {
-                    UTILITY.Notificacion.MailNotification("Pedido con diferencias", "Ya existe un albaran para el pedido " + documento);
+                    UTILITY.Notificacion.MailNotification("Pedido con diferencias", "El archivo de confirmación tiene diferencias, revisar por favor" + documento);
                 }
 
             }

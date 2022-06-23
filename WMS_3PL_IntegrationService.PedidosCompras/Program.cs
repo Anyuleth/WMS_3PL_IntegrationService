@@ -7,6 +7,7 @@ using WMS_3PL_IntegrationService.PedidosCompras.Jobs;
 using Microsoft.Extensions.Configuration;
 using System.IO;
 using System.Configuration;
+using System;
 
 namespace WMS_3PL_IntegrationService.PedidosCompras
 {
@@ -14,18 +15,22 @@ namespace WMS_3PL_IntegrationService.PedidosCompras
     {
         public static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            var parameters = Environment.GetCommandLineArgs();
+            try
+            {
+
+                CreateHostBuilder(parameters).Build().Run();
+            }
+            catch (Exception ex)
+            {
+                UTILITY.Files.LogException(ex, "Main" + parameters);
+            }
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
                  Host.CreateDefaultBuilder(args)
                      .ConfigureServices((hostContext, services) =>
                      {
-                         var builder = new ConfigurationBuilder()
-                        .SetBasePath(Directory.GetCurrentDirectory())
-                        .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
-                         IConfiguration configuration = builder.Build();
-
                          string intervalo = ConfigurationManager.AppSettings["IntervaloServicio"].ToString();
                          services.AddQuartz(q =>
                          {

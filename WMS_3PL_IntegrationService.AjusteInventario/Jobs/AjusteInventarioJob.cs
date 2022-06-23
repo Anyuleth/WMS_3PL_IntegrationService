@@ -19,12 +19,12 @@ namespace WMS_3PL_IntegrationService.AjusteInventario.Jobs
             _logger.LogInformation("WMS_3PL_Job Executing!");
 
             var dataMap = context.MergedJobDataMap;
-            var args = (string[])dataMap["args"];
+            var args = (string)dataMap["args"];
 
-            string servidorBD = ConfigurationManager.AppSettings["Server"].ToString(); //"3.224.17.235,14333";//args[0];//
-            string nombreBD = "MULTIBRANDS_GAP";//args[0];
-            string usuarioBD = ConfigurationManager.AppSettings["User"].ToString();// "icgadmin";//args[2];//
-            string contrasennaBD = ConfigurationManager.AppSettings["Password"].ToString();// "masterkey";//args[3];//
+            string servidorBD = ConfigurationManager.AppSettings["Server"].ToString(); 
+            string nombreBD = args;
+            string usuarioBD = ConfigurationManager.AppSettings["User"].ToString();
+            string contrasennaBD = ConfigurationManager.AppSettings["PassServer"].ToString();
 
             
 
