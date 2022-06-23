@@ -20,25 +20,47 @@ namespace WMS_3PL_IntegrationService.BLL.ConfirmacionPedidoCompra
             try
             {
                 var cadenaDeConexion = DAL.Herramientas.CreaCadena(servidorBD, nombreBD, usuarioBD, contrasennaBD);
-                string extension = ConfigurationManager.AppSettings["ExtencionArchivoXML"].ToString();
-                string archivo = ConfigurationManager.AppSettings["NombreArchivoXML"].ToString();
+                string raizArchivo = ConfigurationManager.AppSettings["NombreArchivoXML"].ToString();
                 string carpeta = ConfigurationManager.AppSettings["CarpetaPedidos"].ToString();
-
+                string hostSFTP = ConfigurationManager.AppSettings["HostSFTP"].ToString();
+                string usernameSFTP = ConfigurationManager.AppSettings["Usuario"].ToString();
+                string passwordSFTP = ConfigurationManager.AppSettings["pass"].ToString();
+                string remoteDirectory = ConfigurationManager.AppSettings["FromWMS"].ToString();
                 var anno = DateTime.Today.Year;
                 var mes = DateTime.Now.ToString("MMMM");
                 var dia = DateTime.Today.Day;
 
-                var carpetaPedidos = carpeta + anno + "\\" + mes + "\\" + dia + "\\";
-                System.IO.FileInfo file = new System.IO.FileInfo(carpetaPedidos);
-                file.Directory.Create();
+                var carpetaPedidos = carpeta + nombreBD + anno + "\\" + mes + "\\" + dia + "\\";
+                System.IO.FileInfo filePath = new System.IO.FileInfo(carpetaPedidos);
+                filePath.Directory.Create();
 
+              
 
-
-                var readFile = UTILITY.SFTP.DownloadFile(archivo, carpetaPedidos, extension);
-                if (readFile)
+                using (SftpClient sftp = new SftpClient(hostSFTP, usernameSFTP, passwordSFTP))
                 {
-                    ProcesarPedidoCompra(carpetaPedidos + archivo + extension, cadenaDeConexion, archivo);
+
+                    sftp.Connect();
+
+                    var files = sftp.ListDirectory(remoteDirectory);
+
+                    foreach (var file in files.Where(f => f.Name.Contains(raizArchivo)).OrderByDescending(o => o.LastWriteTime))
+                    {
+                        using (Stream fileStream = File.Create(carpetaPedidos + file.Name))
+                        {
+                            sftp.DownloadFile(file.FullName, fileStream);
+
+                        }
+                      
+                        ProcesarPedidoCompra(carpetaPedidos + file.Name, cadenaDeConexion, file.Name);
+                    }
+
+
+                    sftp.Disconnect();
+
                 }
+
+
+              
 
             }
             catch (Exception ex)
@@ -62,40 +84,34 @@ namespace WMS_3PL_IntegrationService.BLL.ConfirmacionPedidoCompra
             var jsonPedido = Newtonsoft.Json.JsonConvert.SerializeObject(pedido);
 
 
-            //1.validar que el pedido no tenga un albaran creado
             var existeAlbaran = DAL.ConfirmacionPedidoCompra.ConfirmacionPedidoCompra.ValidarAlbaranExiste(cadenaDeConexion, documento);
 
             if (!existeAlbaran)
             {
-                //2.validar lineas del pedido recibido contra las lineas del pedido decompra enviado
                 var diferenciasPedido = DAL.ConfirmacionPedidoCompra.ConfirmacionPedidoCompra.DireferenciaPedidoCompras(jsonPedido, documento);
 
                 if (!diferenciasPedido.Diferencias)
                 {
-                    //Crear el albarán de compra para ese pedido
                     DAL.ConfirmacionPedidoCompra.ConfirmacionPedidoCompra.CrearAlbaranCompra(cadenaDeConexion, documento, fecha);
-
-                    //mover el archivo a carpeta procesada para ya no leerlo mas
-                    UTILITY.SFTP.MoveFileToProcessed(archivo);
-
-
+                    UTILITY.SFTP.MoveFileToProcessed(archivo, "Processed");
                 }
                 else
                 {
                     UTILITY.Notificacion.MailNotification("Pedido con diferencias", "El archivo de confirmación tiene diferencias, revisar por favor" + documento);
+                    UTILITY.SFTP.MoveFileToProcessed(archivo, "Error");
                 }
 
             }
             else
             {
-                //sino envia notificacion con el error de que ya existe albaran para ese pedi
                 UTILITY.Notificacion.MailNotification("Pedido ya existe", "Ya existe un albaran para el pedido " + documento);
+                UTILITY.SFTP.MoveFileToProcessed(archivo, "Processed");
             }
 
         }
         #endregion
 
-
+       
 
     }
 }

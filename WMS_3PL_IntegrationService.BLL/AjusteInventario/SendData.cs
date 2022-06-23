@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Renci.SshNet;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Text;
 using WMS_3PL_IntegrationService.UTILITY;
@@ -16,25 +18,49 @@ namespace WMS_3PL_IntegrationService.BLL.AjusteInventario
             try
             {
                 var cadenaDeConexion = DAL.Herramientas.CreaCadena(servidorBD, nombreBD, usuarioBD, contrasennaBD);
-                string extension = ConfigurationManager.AppSettings["ExtencionArchivoXML"].ToString();
-                string archivo = ConfigurationManager.AppSettings["NombreArchivoXML"].ToString();
+                string raizArchivo = ConfigurationManager.AppSettings["NombreArchivoXML"].ToString();
                 string carpeta = ConfigurationManager.AppSettings["CarpetaPedidos"].ToString();
-
+                string host = ConfigurationManager.AppSettings["HostSFTP"].ToString();
+                string username = ConfigurationManager.AppSettings["Usuario"].ToString();
+                string password = ConfigurationManager.AppSettings["pass"].ToString();
+                string remoteDirectory = ConfigurationManager.AppSettings["FromWMS"].ToString();
                 var anno = DateTime.Today.Year;
                 var mes = DateTime.Now.ToString("MMMM");
                 var dia = DateTime.Today.Day;
 
-                var carpetaInventario = carpeta + anno + "\\" + mes + "\\" + dia + "\\";
-                System.IO.FileInfo file = new System.IO.FileInfo(carpetaInventario);
-                file.Directory.Create();
+                var carpetaInventario = carpeta+ nombreBD + anno + "\\" + mes + "\\" + dia + "\\";
+                System.IO.FileInfo filepath = new System.IO.FileInfo(carpetaInventario);
+                filepath.Directory.Create();
 
+               
+               
 
-
-                var readFile = UTILITY.SFTP.DownloadFile(archivo, carpetaInventario, extension);
-                if (readFile)
+                using (SftpClient sftp = new SftpClient(host, username, password))
                 {
-                    ProcesarAjusteInvenatario(carpetaInventario + archivo + extension, cadenaDeConexion, archivo);
+
+                    sftp.Connect();
+
+                    var files = sftp.ListDirectory(remoteDirectory);
+
+                    foreach (var file in files.Where(f => f.Name.Contains(raizArchivo)).OrderByDescending(o => o.LastWriteTime))
+                    {
+                        using (Stream fileStream = File.Create(carpetaInventario+file.Name))
+                        {
+                            sftp.DownloadFile(file.FullName, fileStream);
+                           
+                        }
+
+                        ProcesarAjusteInvenatario(carpetaInventario + file.Name, cadenaDeConexion, file.Name);
+                    }
+
+
+                    sftp.Disconnect();
+
                 }
+
+
+
+               
 
             }
             catch (Exception ex)
@@ -51,19 +77,34 @@ namespace WMS_3PL_IntegrationService.BLL.AjusteInventario
         #region Procesa el archivo de ajuste de inventario ymueve al archivo a otra carpeta para no procesarlo mas 
         public static void ProcesarAjusteInvenatario(string carpeta, string cadenaDeConexion, string archivo)
         {
-            var ajusteInventario = XML.DeserializeToObject<ENTITY.AjusteInventario.AjusteInventarios>(carpeta);
-            
-            var codAlmacen = ajusteInventario.Lista_ajusteInventario.Select(x => x.Bodega).FirstOrDefault().Split('-').Last();
-            var fecha = ajusteInventario.Lista_ajusteInventario.Select(x => x.Fecha).FirstOrDefault();
+            try
+            {
+                var ajusteInventario = XML.DeserializeToObject<ENTITY.AjusteInventario.AjusteInventarios>(carpeta);
+
+                var codAlmacen = ajusteInventario.Lista_ajusteInventario.Select(x => x.Bodega).FirstOrDefault().Split('-').Last();
+                var fecha = ajusteInventario.Lista_ajusteInventario.Select(x => x.Fecha).FirstOrDefault();
 
 
-            var jsonAjusteInventario = Newtonsoft.Json.JsonConvert.SerializeObject(ajusteInventario);
+                var jsonAjusteInventario = Newtonsoft.Json.JsonConvert.SerializeObject(ajusteInventario);
 
+                var existeInventario = DAL.AjusteInventario.AjusteInventario.ValidarInventarioExiste(cadenaDeConexion, fecha);
 
-            DAL.AjusteInventario.AjusteInventario.CrearInventario(cadenaDeConexion, codAlmacen, jsonAjusteInventario, fecha);
+                if (!existeInventario)
+                {
 
-            UTILITY.SFTP.MoveFileToProcessed(archivo);
+                    DAL.AjusteInventario.AjusteInventario.CrearInventario(cadenaDeConexion, codAlmacen, jsonAjusteInventario, fecha);
 
+                    UTILITY.SFTP.MoveFileToProcessed(archivo,"Processed");
+                }
+            }
+            catch (Exception ex )
+            {
+                    UTILITY.SFTP.MoveFileToProcessed(archivo, "Error");
+
+                var mensaje = ex.InnerException != null ? ex.Message + ", " + ex.InnerException.Message : ex.Message;
+                DAL.Herramientas.GuardarError(new ENTITY.Errores.Errores("Libreria: BLL - Clase: SendData - Metodo: ProcesarAjusteInvenatario", mensaje.ToString()));
+            }
+           
 
 
 

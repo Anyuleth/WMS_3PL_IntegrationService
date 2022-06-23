@@ -91,7 +91,7 @@ namespace WMS_3PL_IntegrationService.UTILITY
             return enviado = false;
         }
 
-        public static void MoveFileToProcessed(string archivo)
+        public static void MoveFileToProcessed(string archivo, string carpetadestino)
         {
 
             string host = ConfigurationManager.AppSettings["HostSFTP"].ToString();
@@ -109,7 +109,7 @@ namespace WMS_3PL_IntegrationService.UTILITY
 
                 foreach (var file in files.Where(f => f.Name.Contains(archivo)).OrderByDescending(o => o.LastWriteTime).Take(1))
                 {
-                    file.MoveTo("/FromWMS/Processed/" + file.Name);
+                    file.MoveTo("/FromWMS/"+ carpetadestino + "/" + file.Name);
                  
                 }
 

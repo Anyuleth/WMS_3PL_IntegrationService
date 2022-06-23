@@ -11,18 +11,16 @@ namespace WMS_3PL_IntegrationService.BLL.PedidosCompras
 {
     public class SendData
     {
-        
+        #region Enviar los pedidos de compras creados en ICG Manager y enviarlos al BTOB para enviarlos al SFTP
         public static void SendWMS_3PLPedidos()
         {
 
-            #region Enviar los pedidos de compras creados en ICG Manager y enviarlos al BTOB para enviarlos al SFTP
+           
             try
             {
                 List<ENTITY.PedidosCompras.Encabezaddo> encabezados = new List<ENTITY.PedidosCompras.Encabezaddo>();
                 encabezados = DAL.PedidosCompras.PedidosCompras.ObtenerPedidosPendientes();
-
-
-
+                
                 if (encabezados.Count > 0)
                 {
 
@@ -61,9 +59,9 @@ namespace WMS_3PL_IntegrationService.BLL.PedidosCompras
                         pedidos.Detalle = detalle;
 
                         XmlSerializer serialiser = new XmlSerializer(typeof(ENTITY.PedidosCompras.PedidosCompras));
-                        UTILITY.XML.CreateXML(carpetaPedidos + nombreArchivoXML + item.Serie + extencionArchivoXML, pedidos, serialiser);
+                        UTILITY.XML.CreateXML(carpetaPedidos + nombreArchivoXML+ item.Empresa + item.Serie + extencionArchivoXML, pedidos, serialiser);
 
-                        UTILITY.SFTP.SendSFTP(carpetaPedidos, nombreArchivoXML + item.Serie + extencionArchivoXML, out enviadoSFTP, out mensaje);
+                        UTILITY.SFTP.SendSFTP(carpetaPedidos, nombreArchivoXML + item.Empresa + item.Serie + extencionArchivoXML, out enviadoSFTP, out mensaje);
 
                         if (enviadoSFTP)
                         {
